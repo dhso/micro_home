@@ -11,12 +11,11 @@
   }
   .menu-button li div{
     border-radius: 10px;
-    border: 1px solid #ededed;
   }
-  .menu-button li div i{
-    padding-top: 50%;
-    margin-top: -20px;
-    color: green;
+  .menu-button li div img{
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
   }
   .am-header-default{
     background-color:#000;
@@ -24,12 +23,18 @@
   .am-navbar-default .am-navbar-nav{
     background-color:#000;
   }
+  .menu-screen{
+    background-image: url(http://img2.3lian.com/2014/c6/26/d/80.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
 </style>
 {% endblock %}
 
 {% block js %}
 <script type="text/javascript">
   $(document).ready(function(){
+    $('.menu-screen').css('height',$(window).height() - $('header').height() - $('.am-navbar').height());
     $('.menu-button li div').css('height', $('.menu-button li div').width());
   });
 </script>
@@ -37,15 +42,17 @@
 
 
 {% block body %}
-<ul class="menu-button am-avg-sm-4 am-avg-md-5 am-avg-lg-6 am-text-center">
-  <li><div><i class="am-icon-qq am-icon-lg"></i></div></li>
-  <li><div><i class="am-icon-linkedin am-icon-lg"></i></div></li>
-  <li><div><i class="am-icon-windows am-icon-lg"></i></div></li>
-  <li><div><i class="am-icon-wechat am-icon-lg"></i></div></li>
-  <li><div><i class="am-icon-vk am-icon-lg"></i></div></li>
-  <li><div><i class="am-icon-vine am-icon-lg"></i></div></li>
-  <li><div><i class="am-icon-vimeo-square am-icon-lg"></i></div></li>
-  <li><div><i class="am-icon-twitter-square am-icon-lg"></i></div></li>
-  <li><div><i class="am-icon-twitter am-icon-lg"></i></div></li>
-</ul>
+<div class="menu-screen">
+  <ul class="menu-button am-avg-sm-4 am-avg-md-5 am-avg-lg-6 am-text-center">
+    <li><div><img src="http://cdn-img.easyicon.net/png/11867/1186736.gif"></div></li>
+    <li><div><img src="http://cdn-img.easyicon.net/png/11867/1186735.gif"></div></li>
+    <li><div><img src="http://cdn-img.easyicon.net/png/11867/1186732.gif"></div></li>
+    <li><div><img src="http://cdn-img.easyicon.net/png/11867/1186733.gif"></div></li>
+    <li><div><img src="http://cdn-img.easyicon.net/png/11946/1194621.gif"></div></li>
+    <li><div><img src="http://cdn-img.easyicon.net/png/403/40384.gif"></div></li>
+    <li><div><img src="http://cdn-img.easyicon.net/png/11279/1127960.gif"></div></li>
+    <li><div><img src="http://cdn-img.easyicon.net/png/11869/1186903.gif"></div></li>
+    <li><div><img src="http://cdn-img.easyicon.net/png/11869/1186902.gif"></div></li>
+  </ul>
+</div>
 {% endblock %}
