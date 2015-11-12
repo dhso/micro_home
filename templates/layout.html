@@ -32,25 +32,25 @@
 
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/weui.css') }}">
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='amazeui/css/amazeui.min.css') }}">
+  <style type="text/css">
+    .am-header-default .am-header-icon{
+      margin-left: 5px;
+    }
+  </style>
   {% block css %}{% endblock %}
 </head>
 <body>
 
   <header data-am-widget="header" class="am-header am-header-default">
       <div class="am-header-left am-header-nav">
-          <a href="#left-link" class="">
-            <i class="am-header-icon am-icon-home"></i>
-          </a>
+          <span id="current-time"></span>
       </div>
-
-      <h1 class="am-header-title">
           
       </h1>
-
       <div class="am-header-right am-header-nav">
-          <a href="#right-link" class="">
-            <i class="am-header-icon am-icon-bars"></i>
-          </a>
+          <i class="am-header-icon am-icon-phone-square"></i>
+          <i class="am-header-icon am-icon-comments-o"></i>
+          <i class="am-header-icon am-icon-signal"></i>
       </div>
   </header>
 
@@ -58,20 +58,17 @@
       <ul class="am-navbar-nav am-cf am-avg-sm-4">
           <li >
             <a href="tel:123456789" class="">
-                  <span class="am-icon-phone"></span>
-                <span class="am-navbar-label">呼叫</span>
+                  <span class="am-icon-navicon"></span>
             </a>
           </li>
-          <li data-am-navbar-share>
+          <li>
             <a href="###" class="">
-                  <span class="am-icon-share-square-o"></span>
-                <span class="am-navbar-label">分享</span>
+                  <span class="am-icon-home"></span>
             </a>
           </li>
-          <li data-am-navbar-qrcode>
+          <li>
             <a href="###" class="">
-                  <span class="am-icon-qrcode"></span>
-                <span class="am-navbar-label">二维码</span>
+                  <span class="am-icon-chevron-left"></span>
             </a>
           </li>
       </ul>
@@ -92,6 +89,17 @@
   <script src="{{ url_for('static', filename='amazeui/js/amazeui.ie8polyfill.min.js') }}"></script>
   <![endif]-->
   <script src="{{ url_for('static', filename='amazeui/js/amazeui.min.js') }}"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      show_clock('#current-time');
+    });
+    function show_clock(dom_id){
+      setInterval(function() {
+          var now = (new Date()).toLocaleString();
+          $(dom_id).text(now);
+      }, 1000);
+    }
+  </script>
   {% block js %}{% endblock %}
 </body>
 </html>
