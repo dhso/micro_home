@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}
+<title>首页</title>
+{% endblock %}
+
+{% block css %}
+<style type="text/css">
+  .menu-button li{
+    padding: 10px;
+  }
+  .menu-button li div{
+    border-radius: 10px;
+    border: 1px solid #ededed;
+  }
+  .menu-button li div i{
+    padding-top: 50%;
+    margin-top: -20px;
+    color: green;
+  }
+  .am-header-default{
+    background-color:#000;
+  }
+  .am-navbar-default .am-navbar-nav{
+    background-color:#000;
+  }
+</style>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('.menu-button li div').css('height', $('.menu-button li div').width());
+  });
+</script>
+{% endblock %}
+
+
+{% block body %}
+<ul class="menu-button am-avg-sm-4 am-avg-md-5 am-avg-lg-6 am-text-center">
+  <li><div><i class="am-icon-qq am-icon-lg"></i></div></li>
+  <li><div><i class="am-icon-linkedin am-icon-lg"></i></div></li>
+  <li><div><i class="am-icon-windows am-icon-lg"></i></div></li>
+  <li><div><i class="am-icon-wechat am-icon-lg"></i></div></li>
+  <li><div><i class="am-icon-vk am-icon-lg"></i></div></li>
+  <li><div><i class="am-icon-vine am-icon-lg"></i></div></li>
+  <li><div><i class="am-icon-vimeo-square am-icon-lg"></i></div></li>
+  <li><div><i class="am-icon-twitter-square am-icon-lg"></i></div></li>
+  <li><div><i class="am-icon-twitter am-icon-lg"></i></div></li>
+</ul>
+{% endblock %}
