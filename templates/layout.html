@@ -33,8 +33,14 @@
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/weui.css') }}">
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='amazeui/css/amazeui.min.css') }}">
   <style type="text/css">
+    body{
+      position: initial;
+    }
     .am-header-default .am-header-icon{
       margin-left: 5px;
+    }
+    .am-navbar{
+      position: absolute;
     }
   </style>
   {% block css %}{% endblock %}

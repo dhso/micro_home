@@ -11,7 +11,8 @@
 """
 
 from sqlite3 import dbapi2 as sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, _app_ctx_stack
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, _app_ctx_stack, send_from_directory
+import os,config
 
 # configuration
 DATABASE = 'service.db'
@@ -19,12 +20,12 @@ DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'admin'
+PLUGIN_DIR = 'plugins'
 
 # create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
-
 
 def init_db():
     """Creates the database tables."""
@@ -47,6 +48,22 @@ def get_db():
 
     return top.sqlite_db
 
+def load_plugins():
+    plugins = {}
+    for plugin_name in os.listdir(app.config['PLUGIN_DIR']):
+        plugin = {}
+        plugin_dir_path = os.path.join(app.config['PLUGIN_DIR'], plugin_name)
+        plugin_config_path = os.path.join(plugin_dir_path, 'config.ini')
+        print plugin_config_path
+        if os.path.exists(plugin_config_path):
+            configs = config.Config(plugin_config_path);
+            plugin['name'] = configs.get('base', 'name')
+            plugin['path'] = plugin_dir_path
+            plugin['icon'] = os.path.join(plugin_dir_path, configs.get('base', 'icon'))
+        plugins[plugin_name] = plugin
+    return plugins
+            
+
 
 @app.teardown_appcontext
 def close_db_connection(exception):
@@ -61,8 +78,13 @@ def show_entries():
     db = get_db()
     cur = db.execute('select name, desc from plugins order by id desc')
     entries = cur.fetchall()
-    return render_template('index.html', entries=entries)
+    plugins = load_plugins()
+    print plugins
+    return render_template('index.html', entries=entries, plugins = plugins)
 
+@app.route('/plugins/<path:path>')
+def get_resource(path):
+    return send_from_directory('plugins', path)
 
 @app.route('/add', methods=['POST'])
 def add_entry():
