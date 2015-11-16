@@ -43,6 +43,19 @@
     $('.menu-screen').css('height',$(window).height() - $('header').height() - $('.am-navbar').height());
     $('.menu-button li div').css('height', $('.menu-button li div').width());
   });
+  function open_app(url, title){
+    var width = $(window).width();
+    var height = $(window).height() - $('header').height() - $('.am-navbar').height();
+    layer.open({
+        type: 2,
+        title: title,
+        shadeClose: true,
+        shade: false,
+        offset: ['49px', '0px'],
+        area: [width + 'px', height + 'px'],
+        content: url
+    });
+  }
 </script>
 {% endblock %}
 
@@ -51,7 +64,7 @@
 <div class="menu-screen">
   <ul class="menu-button am-avg-sm-4 am-avg-md-5 am-avg-lg-6 am-text-center">
     {% for plugin in plugins.keys() %}
-      <li><div><img src="{{ plugins[plugin].icon }}"></div><p class="menu-name am-text-truncate">{{ plugins[plugin].name }}</p></li>
+      <li onclick="open_app('{{ plugin }}/index', '{{ plugins[plugin].name }}')"><div><img src="{{ plugins[plugin].icon }}"></div><p class="menu-name am-text-truncate">{{ plugins[plugin].name }}</p></li>
     {% endfor %}
   </ul>
 </div>

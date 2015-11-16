@@ -68,12 +68,12 @@
             </a>
           </li>
           <li>
-            <a href="###" class="">
+            <a href="/" class="">
                   <span class="am-icon-home"></span>
             </a>
           </li>
           <li>
-            <a href="###" class="">
+            <a href="javascript:history.back();" class="">
                   <span class="am-icon-chevron-left"></span>
             </a>
           </li>
@@ -95,6 +95,7 @@
   <script src="{{ url_for('static', filename='amazeui/js/amazeui.ie8polyfill.min.js') }}"></script>
   <![endif]-->
   <script src="{{ url_for('static', filename='amazeui/js/amazeui.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
   <script type="text/javascript">
     $(document).ready(function(){
       show_clock('#current-time');

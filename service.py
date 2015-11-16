@@ -48,22 +48,34 @@ def get_db():
 
     return top.sqlite_db
 
-def load_plugins():
+def load_plugins(app):
     plugins = {}
     for plugin_name in os.listdir(app.config['PLUGIN_DIR']):
         plugin = {}
         plugin_dir_path = os.path.join(app.config['PLUGIN_DIR'], plugin_name)
-        plugin_config_path = os.path.join(plugin_dir_path, 'config.ini')
-        print plugin_config_path
-        if os.path.exists(plugin_config_path):
-            configs = config.Config(plugin_config_path);
-            plugin['name'] = configs.get('base', 'name')
-            plugin['path'] = plugin_dir_path
-            plugin['icon'] = os.path.join(plugin_dir_path, configs.get('base', 'icon'))
-        plugins[plugin_name] = plugin
-    return plugins
-            
+        if os.path.isdir(plugin_dir_path):
+            plugin_main_file_path = os.path.join(plugin_dir_path, plugin_name + '.py')
+            print plugin_main_file_path
+            if os.path.exists(plugin_main_file_path):
+                plugin_module=__import__("plugins."+ plugin_name+ "."+ plugin_name, fromlist=[plugin_name])
+                plugin_module.run(app)
 
+def get_plugins():
+    plugins = {}
+    for plugin_name in os.listdir(app.config['PLUGIN_DIR']):
+        plugin = {}
+        plugin_dir_path = os.path.join(app.config['PLUGIN_DIR'], plugin_name)
+        if os.path.isdir(plugin_dir_path):
+            plugin_config_path = os.path.join(plugin_dir_path, 'config.ini')
+            print plugin_config_path
+            if os.path.exists(plugin_config_path):
+                configs = config.Config(plugin_config_path);
+                plugin['name'] = configs.get('base', 'name')
+                plugin['path'] = plugin_dir_path
+                plugin['icon'] = os.path.join(plugin_dir_path, configs.get('base', 'icon'))
+            plugins[plugin_name] = plugin
+    print plugins
+    return plugins
 
 @app.teardown_appcontext
 def close_db_connection(exception):
@@ -74,12 +86,11 @@ def close_db_connection(exception):
 
 
 @app.route('/')
-def show_entries():
+def index():
     db = get_db()
     cur = db.execute('select name, desc from plugins order by id desc')
     entries = cur.fetchall()
-    plugins = load_plugins()
-    print plugins
+    plugins = get_plugins()
     return render_template('index.html', entries=entries, plugins = plugins)
 
 @app.route('/plugins/<path:path>')
@@ -122,4 +133,5 @@ def logout():
 
 if __name__ == '__main__':
     init_db()
+    load_plugins(app)
     app.run(host='0.0.0.0')
