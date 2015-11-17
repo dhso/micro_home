@@ -26,9 +26,6 @@
   .am-header-default{
     background-color:#000;
   }
-  .am-navbar-default .am-navbar-nav{
-    background-color:#000;
-  }
   .menu-screen{
     background-image: url(http://img2.3lian.com/2014/c6/26/d/80.jpg);
     background-size: cover;
@@ -40,12 +37,12 @@
 {% block js %}
 <script type="text/javascript">
   $(document).ready(function(){
-    $('.menu-screen').css('height',$(window).height() - $('header').height() - $('.am-navbar').height());
+    $('.menu-screen').css('height',$(window).height() - $('header').height());
     $('.menu-button li div').css('height', $('.menu-button li div').width());
   });
   function open_app(url, title){
     var width = $(window).width();
-    var height = $(window).height() - $('header').height() - $('.am-navbar').height();
+    var height = $(window).height() - $('header').height();
     layer.open({
         type: 2,
         title: title,
@@ -53,7 +50,8 @@
         shade: false,
         offset: ['49px', '0px'],
         area: [width + 'px', height + 'px'],
-        content: url
+        content: url,
+        zIndex: 0
     });
   }
 </script>

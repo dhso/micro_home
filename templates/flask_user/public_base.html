@@ -71,11 +71,42 @@
       </div>
   </header>
 
-  {% for message in get_flashed_messages() %}
-    <div class=flash>{{ message }}</div>
-  {% endfor %}
+  {% block body %}
+    {% block menu %}
+    <div id="menu-div" class="with-margins">
+        <a href="/">Home</a>
+        {% if call_or_get(current_user.is_authenticated) %}
+            &nbsp; | &nbsp; <a href="{{ url_for('user.profile') }}">User profile</a>
+        {% endif %}
+    </div>
+    {% endblock %}
+    <hr class="no-margins"/>
 
-  {% block body %}{% endblock %}
+    <div id="main-div" class="with-margins">
+    {# One-time system messages called Flash messages #}
+    {% block flash_messages %}
+        {%- with messages = get_flashed_messages(with_categories=true) -%}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category=='error' %}
+                        {% set category='danger' %}
+                    {% endif %}
+                    <div class="alert alert-{{category}}">{{ message|safe }}</div>
+                {% endfor %}
+            {% endif %}
+        {%- endwith %}
+    {% endblock %}
+
+    {% block main %}{% block content %}{% endblock %}{% endblock %}
+    </div>
+
+    <br/>
+    <hr class="no-margins"/>
+    <div id="footer-div" class="clearfix with-margins">
+        <div class="pull-left">MyApp v1.0</div>
+        <div class="pull-right">&copy; 2014 MyCorp</div>
+    </div>
+    {% endblock %}
 
   <!--[if (gte IE 9)|!(IE)]><!-->
   <script src="{{ url_for('static', filename='amazeui/js/jquery.min.js') }}"></script>

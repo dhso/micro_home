@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
-"""
-    Flaskr
-    ~~~~~~
-
-    A microblog example application written as Flask tutorial with
-    Flask and sqlite3.
-
-    :copyright: (c) 2010 by Armin Ronacher.
-    :license: BSD, see LICENSE for more details.
-"""
 
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, _app_ctx_stack, send_from_directory
-import os,config
+from flask_mail import Mail
+from flask_sqlalchemy import SQLAlchemy
+from flask_user import login_required
+from flask_user import roles_required
+from models.login import auth
+from models.config import config
+import os
 
 # configuration
-DATABASE = 'service.db'
+SQLALCHEMY_DATABASE_URI = 'mysql://root:root@localhost/flaskr_wechat'
 DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
@@ -26,27 +22,8 @@ PLUGIN_DIR = 'plugins'
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+db = SQLAlchemy(app)
 
-def init_db():
-    """Creates the database tables."""
-    with app.app_context():
-        db = get_db()
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
-
-def get_db():
-    """Opens a new database connection if there is none yet for the
-    current application context.
-    """
-    top = _app_ctx_stack.top
-    if not hasattr(top, 'sqlite_db'):
-        sqlite_db = sqlite3.connect(app.config['DATABASE'])
-        sqlite_db.row_factory = sqlite3.Row
-        top.sqlite_db = sqlite_db
-
-    return top.sqlite_db
 
 def load_plugins(app):
     plugins = {}
@@ -77,19 +54,11 @@ def get_plugins():
     print plugins
     return plugins
 
-@app.teardown_appcontext
-def close_db_connection(exception):
-    """Closes the database again at the end of the request."""
-    top = _app_ctx_stack.top
-    if hasattr(top, 'sqlite_db'):
-        top.sqlite_db.close()
-
-
 @app.route('/')
+@app.route('/index')
+@login_required
 def index():
-    db = get_db()
-    cur = db.execute('select name, desc from plugins order by id desc')
-    entries = cur.fetchall()
+    entries = {}
     plugins = get_plugins()
     return render_template('index.html', entries=entries, plugins = plugins)
 
@@ -97,21 +66,18 @@ def index():
 def get_resource(path):
     return send_from_directory('plugins', path)
 
-@app.route('/add', methods=['POST'])
-def add_entry():
-    if not session.get('logged_in'):
-        abort(401)
-    db = get_db()
-    db.execute('insert into plugins (name, desc, author, version) values (?, ?, "hadong", "0.1")',
-                 [request.form['title'], request.form['text']])
-    db.commit()
+@app.route('/member')
+@login_required
+def member():
     flash('New entry was successfully posted')
-    return redirect(url_for('show_entries'))
+    return render_template('ss.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
+    from models import Admin
+    form = LoginForm()
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
             error = 'Invalid username'
@@ -127,11 +93,14 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
+    logout_user()
     flash('You were logged out')
-    return redirect(url_for('show_entries'))
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
-    init_db()
+    user_model = auth.UserModel(db, app)
+    #user_model.user_reset()
+    user_model.user_model()
     load_plugins(app)
     app.run(host='0.0.0.0')

@@ -44,7 +44,7 @@ def write_config(config_file_path, field, key, value):
         sys.exit(1)  
     return True  
   
-if __name__ == "__main__":  
+if __name__ == "__main__":
    if len(sys.argv) < 4:  
       sys.exit(1)  
   
