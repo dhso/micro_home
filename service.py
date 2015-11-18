@@ -4,19 +4,31 @@ from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, _app_ctx_stack, send_from_directory
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
-from flask_user import login_required
-from flask_user import roles_required
+from flask_user import login_required, roles_required
 from models.login import auth
-from models.config import config
-import os
+from models.plugin import plugin
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 # configuration
-SQLALCHEMY_DATABASE_URI = 'mysql://root:root@localhost/flaskr_wechat'
 DEBUG = True
-SECRET_KEY = 'development key'
-USERNAME = 'admin'
-PASSWORD = 'admin'
+SECRET_KEY = 'wechat'
+CSRF_ENABLED = True
+# datebase
+SQLALCHEMY_DATABASE_URI = 'mysql://root:root@localhost/flaskr_wechat'
+# plugin
 PLUGIN_DIR = 'plugins'
+# Flask-Mail settings
+MAIL_USERNAME = 'email@example.com'
+MAIL_PASSWORD = 'password'
+MAIL_DEFAULT_SENDER = '"MyApp" <noreply@example.com>'
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = int('465')
+MAIL_USE_SSL = int(True)
+# Flask-User settings
+USER_APP_NAME = "wechat"    # Used by email templates
 
 # create our little application :)
 app = Flask(__name__)
@@ -24,42 +36,12 @@ app.config.from_object(__name__)
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 db = SQLAlchemy(app)
 
-
-def load_plugins(app):
-    plugins = {}
-    for plugin_name in os.listdir(app.config['PLUGIN_DIR']):
-        plugin = {}
-        plugin_dir_path = os.path.join(app.config['PLUGIN_DIR'], plugin_name)
-        if os.path.isdir(plugin_dir_path):
-            plugin_main_file_path = os.path.join(plugin_dir_path, plugin_name + '.py')
-            print plugin_main_file_path
-            if os.path.exists(plugin_main_file_path):
-                plugin_module=__import__("plugins."+ plugin_name+ "."+ plugin_name, fromlist=[plugin_name])
-                plugin_module.run(app)
-
-def get_plugins():
-    plugins = {}
-    for plugin_name in os.listdir(app.config['PLUGIN_DIR']):
-        plugin = {}
-        plugin_dir_path = os.path.join(app.config['PLUGIN_DIR'], plugin_name)
-        if os.path.isdir(plugin_dir_path):
-            plugin_config_path = os.path.join(plugin_dir_path, 'config.ini')
-            print plugin_config_path
-            if os.path.exists(plugin_config_path):
-                configs = config.Config(plugin_config_path);
-                plugin['name'] = configs.get('base', 'name')
-                plugin['path'] = plugin_dir_path
-                plugin['icon'] = os.path.join(plugin_dir_path, configs.get('base', 'icon'))
-            plugins[plugin_name] = plugin
-    print plugins
-    return plugins
-
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
     entries = {}
-    plugins = get_plugins()
+    plugins = plugin.get_plugins(app)
     return render_template('index.html', entries=entries, plugins = plugins)
 
 @app.route('/plugins/<path:path>')
@@ -72,35 +54,7 @@ def member():
     flash('New entry was successfully posted')
     return render_template('ss.html')
 
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    from models import Admin
-    form = LoginForm()
-    if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('show_entries'))
-    return render_template('login.html', error=error)
-
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    logout_user()
-    flash('You were logged out')
-    return redirect(url_for('index'))
-
-
 if __name__ == '__main__':
-    user_model = auth.UserModel(db, app)
-    #user_model.user_reset()
-    user_model.user_model()
-    load_plugins(app)
+    auth.setup(db, app)
+    plugin.load_plugins(db, app)
     app.run(host='0.0.0.0')
